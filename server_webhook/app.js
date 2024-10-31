@@ -22,7 +22,7 @@ export const App = () => {
 
   app.post('/api/v1/dispatch', async (req, res) => {
     await axios.post('http://localhost:3001/api/v1/long-process', {
-      message: 'Dispatch request',
+      id: req.body.id,
     });
     res.status(200).send('Webhook received');
   });
