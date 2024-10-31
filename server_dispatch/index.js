@@ -13,7 +13,7 @@ const server = http.createServer(app);
 
 app.post('/api/v1/long-process', (req, res) => {
   setTimeout(async () => {
-    await axios.post('http://localhost:3000/api/v1/webhook', {
+    await axios.post(`http://localhost:${globalConfig.apiWebsocketPort}/api/v1/webhook`, {
       message: 'Long process completed',
       data: {
         status: 'success',
