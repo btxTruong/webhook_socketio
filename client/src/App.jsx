@@ -8,6 +8,7 @@ import {useAuth0} from '@auth0/auth0-react';
 export const App = () => {
   const {
     isAuthenticated,
+    getAccessTokenSilently
   } = useAuth0();
 
   const [isReceived, setIsReceived] = useState(false);
@@ -68,12 +69,17 @@ export const App = () => {
       <Button
         variant="contained"
         onClick={async () => {
+          const token = await getAccessTokenSilently();
           const id = Date.now();
           setAppId(id);
           await axios.post(
             `http://localhost:${globalConfig.apiWebsocketPort}/api/v1/dispatch`,
             {
               id,
+            }, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
             });
         }}
       >

@@ -2,6 +2,16 @@ import express from 'express';
 import axios from 'axios';
 import cors from 'cors';
 import globalConfig from '../global_config.json' assert {type: 'json'};
+import authConfig from '../auth_config.json' assert {type: 'json'};
+
+import {auth} from 'express-oauth2-jwt-bearer';
+
+const checkJwt = auth(
+  {
+    audience: authConfig.audience,
+    issuerBaseURL: `https://${authConfig.domain}/`,
+    algorithms: ['RS256'],
+  });
 
 export const App = () => {
   const app = express();
@@ -21,11 +31,12 @@ export const App = () => {
     res.status(200).end();
   });
 
-  app.post('/api/v1/dispatch', async (req, res) => {
-    await axios.post(`http://localhost:${globalConfig.apiDispatchPort}/api/v1/long-process`, {
-      id: req.body.id,
-    });
-    res.status(200).send('Webhook received');
+  app.post('/api/v1/dispatch', checkJwt, async (req, res) => {
+    axios.post(
+      `http://localhost:${globalConfig.apiDispatchPort}/api/v1/long-process`, {
+        id: req.body.id,
+      });
+    res.status(200).end();
   });
 
   return app;
