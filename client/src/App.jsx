@@ -8,25 +8,35 @@ function App() {
   const [data, setData] = useState(null);
   const [appId, setAppId] = useState(null);
 
+  // https://socket.io/how-to/use-with-react
+  useEffect(() => {
+    socket.connect();
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
   useEffect(() => {
     function webhookEvent(data) {
-      socket.disconnect();
-      setData(data);
-      setIsReceived(true);
+      if (data.data.id === appId) {
+        setIsReceived(true);
+        setData(data);
+      }
     }
 
     socket.on('webhook', webhookEvent);
 
     return () => {
+      // https://socket.io/how-to/use-with-react#dependencies
       socket.off('webhook', webhookEvent);
     };
-  }, []);
+  }, [appId]);
 
   return (
     <>
       <button
         onClick={async () => {
-          socket.connect();
           const id = Date.now();
           setAppId(id);
           await axios.post('http://localhost:3000/api/v1/dispatch', {
