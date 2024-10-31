@@ -8,13 +8,6 @@ import './index.css';
 import {ThemeProvider} from '@mui/material';
 import {theme} from './theme';
 
-const onRedirectCallback = (appState) => {
-  history.push(
-    appState && appState.returnTo
-      ? appState.returnTo
-      : window.location.pathname,
-  );
-};
 
 // Please see https://auth0.github.io/auth0-react/interfaces/Auth0ProviderOptions.html
 // for a full list of the available properties on the provider
@@ -23,7 +16,6 @@ const config = getConfig();
 const providerConfig = {
   domain: config.domain,
   clientId: config.clientId,
-  onRedirectCallback,
   authorizationParams: {
     redirect_uri: window.location.origin,
     ...(config.audience ? {audience: config.audience} : null),
