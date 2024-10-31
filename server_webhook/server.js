@@ -3,6 +3,11 @@ import * as http from 'node:http';
 import {Server} from 'socket.io';
 
 import globalConfig from "../global_config.json" assert {type: "json"};
+import authConfig from '../auth_config.json' assert {type: 'json'};
+
+import {socketIOAuth0} from './socketIOAuth0Middleware.js';
+
+const verifySocketIO = socketIOAuth0(authConfig.domain, authConfig.audience);
 
 const app = App();
 
@@ -14,6 +19,8 @@ const io = new Server(server, {
 });
 
 app.set('socketIO', io);
+
+io.use(verifySocketIO);
 
 io.on('connection', (socket) => {
   socket.on('disconnect', () => {

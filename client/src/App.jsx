@@ -8,7 +8,7 @@ import {useAuth0} from '@auth0/auth0-react';
 export const App = () => {
   const {
     isAuthenticated,
-    getAccessTokenSilently
+    getAccessTokenSilently,
   } = useAuth0();
 
   const [isReceived, setIsReceived] = useState(false);
@@ -17,8 +17,6 @@ export const App = () => {
 
   // https://socket.io/how-to/use-with-react
   useEffect(() => {
-    socket.connect();
-
     return () => {
       socket.disconnect();
     };
@@ -70,6 +68,8 @@ export const App = () => {
         variant="contained"
         onClick={async () => {
           const token = await getAccessTokenSilently();
+          socket.auth = {token};
+          socket.connect();
           const id = Date.now();
           setAppId(id);
           await axios.post(
