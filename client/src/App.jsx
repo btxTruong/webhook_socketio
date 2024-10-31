@@ -1,9 +1,9 @@
 import {useEffect, useState} from 'react';
-import './App.css';
 import {socket} from './socket.js';
 import axios from 'axios';
+import {Box, Button, Typography} from '@mui/material';
 
-function App() {
+export const App = () => {
   const [isReceived, setIsReceived] = useState(false);
   const [data, setData] = useState(null);
   const [appId, setAppId] = useState(null);
@@ -34,8 +34,17 @@ function App() {
   }, [appId]);
 
   return (
-    <>
-      <button
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        height: '50vh',
+        justifyContent: 'center',
+        flexDirection: 'column',
+      }}
+    >
+      <Button
+        variant="contained"
         onClick={async () => {
           const id = Date.now();
           setAppId(id);
@@ -45,53 +54,50 @@ function App() {
         }}
       >
         Dispatch long process
-      </button>
+      </Button>
       {
         appId
         && (
-          <p
-            style={{
+          <Typography
+            sx={{
               color: 'blue',
             }}
           >
             ID Send: {appId}
-          </p>
+          </Typography>
         )
       }
-
-      <p
-        style={{
+      <Typography
+        sx={{
           color: isReceived ? 'green' : 'red',
         }}
       >
         {isReceived ? 'Received' : 'Not received'}
-      </p>
+      </Typography>
       {
         data
         && (
-          <div>
-            <p>
+          <Box>
+            <Typography>
               Message: {data.message}
-            </p>
-            <p>
+            </Typography>
+            <Typography>
               Status: {data.data.status}
-            </p>
-            <div>
-              <p
-                style={{
+            </Typography>
+            <Box>
+              <Typography
+                sx={{
                   color: data.data.id === appId ? 'green' : 'red',
                 }}
               >
                 ID Receive: {data.data.id} {data.data.id === appId
                 ? '(Match)'
                 : '(Not match)'}
-              </p>
-            </div>
-          </div>
+              </Typography>
+            </Box>
+          </Box>
         )
       }
-    </>
+    </Box>
   );
-}
-
-export default App;
+};

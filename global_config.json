@@ -1,0 +1,5 @@
+{
+  "appPort": 5000,
+  "apiWebsocketPort": 5001,
+  "apiDispatchPort": 5002
+}
