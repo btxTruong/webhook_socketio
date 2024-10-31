@@ -1,0 +1,14 @@
+{
+  "name": "webhook_websocket",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start:dispatch": "node server_dispatch/index.js",
+    "start:webhook": "node server_webhook/server.js",
+    "start:ui": "npm run dev --prefix client",
+    "start": "npx concurrently \"npm run start:dispatch\" \"npm run start:webhook\" \"npm run start:ui\""
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
