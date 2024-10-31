@@ -24,10 +24,8 @@ export const App = () => {
 
   useEffect(() => {
     function webhookEvent(data) {
-      if (data.data.id === appId) {
-        setIsReceived(true);
-        setData(data);
-      }
+      setIsReceived(true);
+      setData(data);
     }
 
     socket.on('webhook', webhookEvent);
