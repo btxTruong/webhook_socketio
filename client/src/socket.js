@@ -1,5 +1,7 @@
 import {io} from 'socket.io-client';
 
-export const socket = io('http://localhost:3000', {
+import globalConfig from '../../global_config.json';
+
+export const socket = io(`http://localhost:${globalConfig.apiWebsocketPort}`, {
   autoConnect: false,
 });
