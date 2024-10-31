@@ -67,10 +67,13 @@ export const App = () => {
       <Button
         variant="contained"
         onClick={async () => {
+          const id = Date.now();
           const token = await getAccessTokenSilently();
           socket.auth = {token};
+          socket.io.opts.query = {
+            appId: id,
+          };
           socket.connect();
-          const id = Date.now();
           setAppId(id);
           await axios.post(
             `http://localhost:${globalConfig.apiWebsocketPort}/api/v1/dispatch`,

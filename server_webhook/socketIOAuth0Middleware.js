@@ -17,6 +17,7 @@ export const socketIOAuth0 = (domain, audience) => {
 
   return async function(socket, next) {
     const jwt = socket.handshake.auth.token;
+    const appId = socket.handshake.query.appId;
 
     if (typeof jwt !== 'string') {
       return next(
@@ -28,7 +29,7 @@ export const socketIOAuth0 = (domain, audience) => {
 
     try {
       const {payload, protectedHeader} = await jwtVerify(jwt, JWKS, config);
-      socket.auth = {sub: payload.sub};
+      socket.auth = {sub: payload.sub, appId, socketId: socket.id};
     } catch (err) {
       return next(new Error('Failed to verify jwt, user not authorized'));
     }
