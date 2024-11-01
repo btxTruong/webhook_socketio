@@ -14,11 +14,33 @@ export const App = () => {
   const [isReceived, setIsReceived] = useState(false);
   const [data, setData] = useState(null);
   const [appId, setAppId] = useState(null);
+  const [socketId, setSocketId] = useState(null);
+
+  const reset = () => {
+    setIsReceived(false);
+    setData(null);
+    setAppId(null);
+  }
+
+  useEffect(() => {
+    const connectSocket = async () => {
+      const token = await getAccessTokenSilently();
+      if (token && !socket.connected) {
+        socket.auth = {token};
+        socket.connect();
+      }
+    };
+    connectSocket().catch(console.error);
+  }, [getAccessTokenSilently, isAuthenticated]);
 
   // https://socket.io/how-to/use-with-react
   useEffect(() => {
     return () => {
-      socket.disconnect();
+      try {
+        socket.disconnect();
+      } catch (e) {
+        console.error(e);
+      }
     };
   }, []);
 
@@ -28,9 +50,16 @@ export const App = () => {
       setData(data);
     }
 
+    function onConnect() {
+      setSocketId(socket.id);
+    }
+
+    socket.on('connect', onConnect);
     socket.on('webhook', webhookEvent);
 
     return () => {
+      // should in order
+      socket.off('connect', onConnect);
       // https://socket.io/how-to/use-with-react#dependencies
       socket.off('webhook', webhookEvent);
     };
@@ -64,19 +93,15 @@ export const App = () => {
     >
       <Button
         variant="contained"
+        disabled={!socketId}
         onClick={async () => {
-          const id = Date.now();
+          reset();
           const token = await getAccessTokenSilently();
-          socket.auth = {token};
-          socket.io.opts.query = {
-            appId: id,
-          };
-          socket.connect();
-          setAppId(id);
+          setAppId(socketId);
           await axios.post(
             `http://localhost:${globalConfig.apiWebsocketPort}/api/v1/dispatch`,
             {
-              id,
+              socketId,
             }, {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -128,10 +153,10 @@ export const App = () => {
             >
               <Typography
                 sx={{
-                  color: data.data.id === appId ? 'green' : 'red',
+                  color: data.data.socketId === appId ? 'green' : 'red',
                 }}
               >
-                ID Receive: {data.data.id} {data.data.id === appId
+                ID Receive: {data.data.socketId} {data.data.socketId === appId
                 ? '(Match)'
                 : '(Not match)'}
               </Typography>

@@ -17,7 +17,7 @@ app.post('/api/v1/long-process', (req, res) => {
       message: 'Long process completed',
       data: {
         status: 'success',
-        id: req.body.id,
+        socketId: req.body.socketId,
       },
     });
     res.status(200).send('Long process completed');
