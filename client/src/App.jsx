@@ -15,11 +15,11 @@ export const App = () => {
   const [data, setData] = useState(null);
   const [appId, setAppId] = useState(null);
   const [socketId, setSocketId] = useState(null);
+  const [isRoomJoined, setIsRoomJoined] = useState(false);
 
   const reset = () => {
     setIsReceived(false);
     setData(null);
-    setAppId(null);
   }
 
   useEffect(() => {
@@ -41,6 +41,26 @@ export const App = () => {
       } catch (e) {
         console.error(e);
       }
+    };
+  }, []);
+
+  useEffect(() => {
+    const appId = 'app-goood1'
+    setAppId(appId);
+    socket.emit('join-room', appId);
+  }, []);
+
+  useEffect(() => {
+    function onRoomJoined(data) {
+      console.log('>> already joined room', data);
+      setIsRoomJoined(true);
+    }
+
+    socket.on('joined-room', onRoomJoined);
+
+    return () => {
+      // should in order
+      socket.off('joined-room', onRoomJoined);
     };
   }, []);
 
@@ -93,15 +113,14 @@ export const App = () => {
     >
       <Button
         variant="contained"
-        disabled={!socketId}
+        disabled={!socketId || !isRoomJoined}
         onClick={async () => {
           reset();
           const token = await getAccessTokenSilently();
-          setAppId(socketId);
           await axios.post(
             `http://localhost:${globalConfig.apiWebsocketPort}/api/v1/dispatch`,
             {
-              socketId,
+              roomId: appId,
             }, {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -153,10 +172,10 @@ export const App = () => {
             >
               <Typography
                 sx={{
-                  color: data.data.socketId === appId ? 'green' : 'red',
+                  color: data.data.roomId === appId ? 'green' : 'red',
                 }}
               >
-                ID Receive: {data.data.socketId} {data.data.socketId === appId
+                ID Receive: {data.data.roomId} {data.data.roomId === appId
                 ? '(Match)'
                 : '(Not match)'}
               </Typography>

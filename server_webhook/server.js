@@ -23,6 +23,11 @@ app.set('socketIO', io);
 io.use(verifySocketIO);
 
 io.on('connection', (socket) => {
+  socket.on('join-room', (roomId) => {
+    socket.join(roomId);
+    socket.emit('joined-room', roomId);
+  });
+
   socket.on('disconnect', () => {
     console.log('User disconnected');
   });

@@ -21,10 +21,10 @@ export const App = () => {
 
   app.post('/api/v1/webhook', (req, res) => {
     const {app} = req;
-    const socketId = req.body.data.socketId;
+    const roomId = req.body.data.roomId;
 
     const io = app.get('socketIO');
-    io.to(socketId).emit('webhook', {
+    io.to(roomId).emit('webhook', {
       message: req.body.message,
       data: req.body.data,
     });
@@ -35,7 +35,7 @@ export const App = () => {
   app.post('/api/v1/dispatch', checkJwt, async (req, res) => {
     axios.post(
       `http://localhost:${globalConfig.apiDispatchPort}/api/v1/long-process`, {
-        socketId: req.body.socketId,
+        roomId: req.body.roomId,
       });
     res.status(200).end();
   });
